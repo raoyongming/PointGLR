@@ -1,0 +1,1 @@
+from .ModelNet40Loader import ModelNetCls
