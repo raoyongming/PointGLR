@@ -1,6 +1,6 @@
 PointGLR
 ===
-This repository contains the PyTorch implementation for paper __Global-Local Bidirectional Reasoning for Unsupervised Representation Learning of 3D Point Clouds__ (CVPR 2020) \[[Paper](https://raoyongming.github.io/files/PointGLR.pdf)\]
+This repository contains the PyTorch implementation for paper __Global-Local Bidirectional Reasoning for Unsupervised Representation Learning of 3D Point Clouds__ (CVPR 2020) \[[arXiv](https://arxiv.org/abs/2003.12971)\]
 
 ![overview](https://raoyongming.github.io/files/fig_PointGLR.jpg)
 
