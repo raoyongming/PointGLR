@@ -11,7 +11,7 @@ from models.rscnn_ssn_ss import RSCNN_SSN, MetricLoss, ChamferLoss
 from models.pointnet2_ss import PointNet2, NormalLoss
 
 from models.foldingnet import FoldingNet, NormalNet
-from data import ModelNetCls
+from data import ModelNetCls, ScanObjectNNCls, ScanNetCls
 
 import utils.pytorch_utils as pt_utils
 import utils.pointnet2_utils as pointnet2_utils
@@ -27,7 +27,7 @@ parser = argparse.ArgumentParser(description='Global-Local Reasoning Training')
 parser.add_argument('--config', default='cfgs/config.yaml', type=str)
 parser.add_argument('--name', default='default', type=str)
 parser.add_argument('--arch', default='pointnet2', type=str)
-parser.add_argument('--trainset', default='modelnet', type=str)
+parser.add_argument('--dataset', default='modelnet', type=str)
 
 
 def worker_init_fn(worker_id):
@@ -64,24 +64,62 @@ def main():
         num_workers=int(args.workers),
         pin_memory=True, worker_init_fn=worker_init_fn
     )
-    
-    train_dataset40 = ModelNetCls(transforms=train_transforms, self_supervision=False, train=True)
-    train_dataloader40 = DataLoader(
-        train_dataset40,
-        batch_size=args.batch_size,
-        shuffle=True, 
-        num_workers=int(args.workers), 
-        pin_memory=True, worker_init_fn=worker_init_fn
-    )
 
-    test_dataset40 = ModelNetCls(transforms=test_transforms, self_supervision=False, train=False)
-    test_dataloader40 = DataLoader(
-        test_dataset40,
-        batch_size=args.batch_size,
-        shuffle=False, 
-        num_workers=int(args.workers), 
-        pin_memory=True
-    )
+    if args.trainset == 'modelnet':
+        train_dataset = ModelNetCls(transforms=train_transforms, self_supervision=False, train=True)
+        train_dataloader = DataLoader(
+            train_dataset,
+            batch_size=args.batch_size,
+            shuffle=True,
+            num_workers=int(args.workers),
+            pin_memory=True, worker_init_fn=worker_init_fn
+        )
+
+        test_dataset = ModelNetCls(transforms=test_transforms, self_supervision=False, train=False)
+        test_dataloader = DataLoader(
+            test_dataset,
+            batch_size=args.batch_size,
+            shuffle=False,
+            num_workers=int(args.workers),
+            pin_memory=True
+        )
+    elif args.trainset == 'scannet':
+        train_dataset = ScanNetCls(transforms=train_transforms, self_supervision=False, train=True)
+        train_dataloader = DataLoader(
+            train_dataset,
+            batch_size=args.batch_size,
+            shuffle=True,
+            num_workers=int(args.workers),
+            pin_memory=True, worker_init_fn=worker_init_fn
+        )
+
+        test_dataset = ScanNetCls(transforms=test_transforms, self_supervision=False, train=False)
+        test_dataloader = DataLoader(
+            test_dataset,
+            batch_size=args.batch_size,
+            shuffle=False,
+            num_workers=int(args.workers),
+            pin_memory=True
+        )
+    elif args.trainset == 'scanobjectnn':
+        train_dataset = ScanObjectNNCls(transforms=train_transforms, self_supervision=False, train=True)
+        train_dataloader = DataLoader(
+            train_dataset,
+            batch_size=args.batch_size,
+            shuffle=True,
+            num_workers=int(args.workers),
+            pin_memory=True, worker_init_fn=worker_init_fn
+        )
+        test_dataset = ScanObjectNNCls(transforms=test_transforms, self_supervision=False, train=False)
+        test_dataloader = DataLoader(
+            test_dataset,
+            batch_size=args.batch_size,
+            shuffle=False,
+            num_workers=int(args.workers),
+            pin_memory=True
+        )
+    else:
+        raise NotImplementedError
 
     # models
     n_rkhs = 512
@@ -125,7 +163,7 @@ def main():
     args.val_freq_epoch = 1.0
     
     # training & evaluation
-    train(ss_dataloader, train_dataloader40, test_dataloader40, encoder, decoer, optimizer, lr_scheduler, bnm_scheduler, args, num_batch, begin_epoch)
+    train(ss_dataloader, train_dataloader, test_dataloader, encoder, decoer, optimizer, lr_scheduler, bnm_scheduler, args, num_batch, begin_epoch)
     
 
 def train(ss_dataloader, train_dataloader, test_dataloader, encoder, decoer, optimizer, lr_scheduler, bnm_scheduler, args, num_batch, begin_epoch):

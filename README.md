@@ -34,6 +34,8 @@ cmake .. && make
 
 ### Dataset Preparation
 
+#### ModelNet
+
 - Download ModelNet point clouds (XYZ and normal):
 ```
 mkdir dataset && cd dataset
@@ -43,6 +45,33 @@ unzip modelnet40_normal_resampled.zip
 - Preprocess dataset:
 ```
 CUDA_VISIBLE_DEVICES=0 python tools/prepare_modelnet.py
+```
+
+#### ScanNet
+
+You can download our prepared ScanNet dataset for object classification from [Google Drive](https://drive.google.com/file/d/176bUICMaEaDxoK4greUxV-3oseJJJ1v0/view?usp=sharing) and move the uncompressed data folder to `dataset/scannet`. The data structure should be:
+```
+dataset/scannet
+├── train_files.txt
+├── test_files.txt
+├── train_0.h5
+...
+├── test_0.h5
+...
+```
+
+#### ScanObjectNN
+
+The ScanObjectNN dataset can be found [here](https://github.com/hkust-vgd/scanobjectnn). You can download the `h5_files.zipped` and move the uncompressed data folder to `dataset/ScanObjectNN`. The data sturcture should be:
+```
+dataset/ScanObjectNN
+├── main_split
+|  └── training_objectdataset.h5
+|  ...
+├── main_split_nobg
+|  └── training_objectdataset.h5
+|  ...
+...
 ```
 
 ### Training & Evaluation
@@ -56,6 +85,15 @@ bash train.sh exp_name pointnet2 modelnet
 ```
 You can  modify `multiplier` in `cfgs/config.yaml` to train larger models. As a reference, the unsupervisedly trained 1x SSG PointNet++ and 1x SSG RSCNN models should have around 92.2% accuracy on ModelNet40. By increasing channel width (4x~5x), our best PointNet++ and RSCNN models achieved around 93.0% accuracy. The results might vary by 0.2%~0.5% between identical runs due to different random seed.
 
+To obtain the results on ScanNet:
+```
+bash train.sh exp_name pointnet2 scannet
+```
+To obtain the results on ScanObjectNN:
+```
+bash train.sh exp_name pointnet2 scanobjectnn
+```
+Note that for experiments on ScanNet and ScanObjectNN, the feature extraction network is still trained on ModelNet. We only train the Linear SVM classifier on the corresponding dataset to obtain the classification results.  
 ## Acknowledgement
 
 The code is based on [Relation-Shape CNN](https://github.com/Yochengliu/Relation-Shape-CNN) and [Pointnet2_PyTorch](https://github.com/erikwijmans/Pointnet2_PyTorch).
