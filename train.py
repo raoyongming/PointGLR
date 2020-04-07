@@ -65,7 +65,7 @@ def main():
         pin_memory=True, worker_init_fn=worker_init_fn
     )
 
-    if args.trainset == 'modelnet':
+    if args.dataset == 'modelnet':
         train_dataset = ModelNetCls(transforms=train_transforms, self_supervision=False, train=True)
         train_dataloader = DataLoader(
             train_dataset,
@@ -83,7 +83,7 @@ def main():
             num_workers=int(args.workers),
             pin_memory=True
         )
-    elif args.trainset == 'scannet':
+    elif args.dataset == 'scannet':
         train_dataset = ScanNetCls(transforms=train_transforms, self_supervision=False, train=True)
         train_dataloader = DataLoader(
             train_dataset,
@@ -101,7 +101,7 @@ def main():
             num_workers=int(args.workers),
             pin_memory=True
         )
-    elif args.trainset == 'scanobjectnn':
+    elif args.dataset == 'scanobjectnn':
         train_dataset = ScanObjectNNCls(transforms=train_transforms, self_supervision=False, train=True)
         train_dataloader = DataLoader(
             train_dataset,
